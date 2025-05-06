@@ -3,12 +3,17 @@ import { useEffect, useState, useRef, useCallback } from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/router';
 import {
-  Container, Grid, Card, CardMedia, CardContent, Typography
+  Container,
+  Grid,
+  Card,
+  CardMedia,
+  CardContent,
+  Typography
 } from '@mui/material';
 import { useAuth } from '../../store/auth';
 
 export default function Characters() {
-  const { user } = useAuth();
+  const { user, _hydrated } = useAuth();
   const router = useRouter();
 
   const [chars, setChars] = useState([]);
@@ -16,12 +21,14 @@ export default function Characters() {
   const [hasMore, setHasMore] = useState(true);
   const loader = useRef(null);
 
-  // Redirect si no hay user
+  // 1) Redirect SOLO después de que Zustand se hidrate
   useEffect(() => {
-    if (!user) router.replace('/login');
-  }, [user]);
+    if (_hydrated && !user) {
+      router.replace('/login');
+    }
+  }, [_hydrated, user, router]);
 
-  // Fetch de cada página
+  // 2) Fetch de páginas cuando haya sesión y tras hidratación
   const fetchCharacters = useCallback(async () => {
     try {
       const res = await axios.get(
@@ -36,39 +43,47 @@ export default function Characters() {
   }, [page]);
 
   useEffect(() => {
-    if (user) fetchCharacters();
-  }, [user, fetchCharacters]);
+    if (_hydrated && user) {
+      fetchCharacters();
+    }
+  }, [_hydrated, user, fetchCharacters]);
 
-  // IntersectionObserver para infinite scroll
+  // 3) Infinite scroll observer permanece siempre en el DOM
   useEffect(() => {
     if (!loader.current || !hasMore) return;
-    const observer = new IntersectionObserver(
-      (entries) => {
+    const obs = new IntersectionObserver(
+      entries => {
         if (entries[0].isIntersecting) {
-          setPage(prev => prev + 1);
+          setPage(p => p + 1);
         }
       },
       { rootMargin: '200px' }
     );
-    observer.observe(loader.current);
-    return () => observer.disconnect();
+    obs.observe(loader.current);
+    return () => obs.disconnect();
   }, [hasMore]);
 
   const openDetail = id => router.push(`/characters/${id}`);
 
   return (
     <Container sx={{ py: 4 }}>
-      <Grid 
-        container 
-        spacing={2}
-        justifyContent="center"
-        alignItems="stretch"
-      >
+
+      <Grid container spacing={2} justifyContent="center" alignItems="stretch">
         {chars.map(ch => (
           <Grid item key={ch.id} xs={12} sm={6} md={4} lg={3}>
             <Card
               onClick={() => openDetail(ch.id)}
-              sx={{ cursor: 'pointer', height: '100%', display: 'flex', flexDirection: 'column' }}
+              sx={{
+                cursor: 'pointer',
+                height: '100%',
+                display: 'flex',
+                flexDirection: 'column',
+                transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+                '&:hover': {
+                  transform: 'scale(1.05)',
+                  boxShadow: theme => theme.shadows[6]
+                }
+              }}
             >
               <CardMedia
                 component="img"
@@ -87,8 +102,8 @@ export default function Characters() {
         ))}
       </Grid>
 
-      {/* Sentinel para infinite scroll */}
-      <div ref={loader} />
+      {/* Sentinel para infinite scroll, siempre presente */}
+      <div ref={loader} style={{ height: 1 }} />
 
       {!hasMore && (
         <Typography align="center" sx={{ mt: 2 }}>
