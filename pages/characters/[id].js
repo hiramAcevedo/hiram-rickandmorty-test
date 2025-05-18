@@ -4,12 +4,22 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Container, Typography, Box, Button, Stack } from '@mui/material';
 
+/**
+ * Página de detalle de personaje
+ * 
+ * Esta página demuestra:
+ * - Uso de rutas dinámicas con [id] en Next.js
+ * - Obtención de parámetros de ruta con useRouter
+ * - Peticiones a API externa con axios
+ * - Navegación programática entre páginas
+ * - Estilos y layout con Material-UI
+ */
 export default function Detail() {
   const router = useRouter();
   const { id } = router.query;
   const [char, setChar] = useState(null);
 
-  // Carga de datos cuando cambia el id
+  // Carga de datos cuando cambia el parámetro de ruta
   useEffect(() => {
     if (!id) return;
     axios
@@ -20,18 +30,20 @@ export default function Detail() {
 
   if (!char) return null;
 
-  // Calculamos ids adyacentes
+  // Navegación entre personajes adyacentes
   const currentId = parseInt(id, 10);
   const prevId = currentId > 1 ? currentId - 1 : null;
   const nextId = currentId + 1; // asume que existe; la API llega hasta 826
 
   return (
     <Container sx={{ py: 4 }}>
+      {/* Botones de navegación */}
       <Stack direction="row" spacing={1} mb={2}>
-        <Button variant="outlined" onClick={() => router.back()}>
+        <Button variant="outlined" onClick={() => router.push('/characters')}>
           Volver
         </Button>
 
+        {/* Navegación condicional al personaje anterior */}
         {prevId && (
           <Button
             variant="contained"
@@ -41,6 +53,7 @@ export default function Detail() {
           </Button>
         )}
 
+        {/* Navegación al personaje siguiente */}
         <Button
           variant="contained"
           onClick={() => router.push(`/characters/${nextId}`)}
@@ -53,6 +66,7 @@ export default function Detail() {
         {char.name}
       </Typography>
 
+      {/* Diseño flexible con flex layout */}
       <Box sx={{ display: 'flex', gap: 4, mt: 2, flexWrap: 'wrap' }}>
         <Box
           component="img"

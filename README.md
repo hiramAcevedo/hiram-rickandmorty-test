@@ -1,16 +1,30 @@
-# Hiram Technical Test: Rick & Morty Explorer
+# Hiram Technical Test: Rick & Morty Explorer - Actividad 3.5
 
-Una aplicación de demostración construida con **Next.js (pages router)**, **Material‑UI**, **Zustand** y **Axios**, para:
+Una aplicación de demostración construida con **Next.js (pages router)**, **Material‑UI**, **Zustand** y **Axios**, que implementa todos los elementos solicitados en la Actividad 3.5 de Prototipado en Next.js:
 
-* Autenticación de usuario (hard‑coded) con persistencia en **localStorage**.
-* Selección de un "personaje favorito" durante el login.
-* Listado de personajes de la API de **Rick & Morty** con **scroll infinito** y animación hover.
-* Página de detalle de cada personaje con navegación "Anterior" y "Siguiente".
-* Barra de navegación sticky con avatar de usuario, nombre y botón de logout.
+## ✅ Elementos de Next.js implementados
 
-**Incluye respuestas a las preguntas del ejercicio al final del documento.**
+### Diseño y maquetado
+- **Clases y estilos**: Implementados mediante Material-UI y estilos en línea con la propiedad `sx`
+- **Listas**: Implementadas en la página de personajes con Grid de Material-UI y renderizado de listas de personajes
 
----
+### Componentes
+- **Registro de componentes**: Implementados en la carpeta `/components` (NavBar, CharacterCard)
+- **Paso de datos sobre componentes**: Mediante props entre componentes padre e hijos
+- **Eventos**: Manejo de eventos onClick, onChange, onSubmit en formularios y elementos interactivos
+
+### Rutas y navegación
+- **Páginas y rutas dinámicas**: Implementadas con el sistema de páginas de Next.js
+- **Navegación entre páginas**: Implementada con useRouter y componente Link
+- **Layouts compartidos**: Implementado en `_app.js` con NavBar compartido
+
+## 🔐 Credenciales de acceso para pruebas
+
+Para probar la aplicación, utiliza las siguientes credenciales hardcodeadas:
+* **Usuario:** `Test123`
+* **Contraseña:** `password@2`
+
+Además, debes seleccionar un personaje favorito para habilitar el botón de login.
 
 ## 🚀 Instalación
 
@@ -33,13 +47,6 @@ npm run dev
 ```
 
 Abre en tu navegador: [http://localhost:3000](http://localhost:3000)
-
-## 🔐 Credenciales de prueba
-
-* **Usuario:** `Test123`
-* **Contraseña:** `password@2`
-
-Debes además seleccionar un personaje favorito para habilitar el botón de login.
 
 ## 📄 Estructura principal
 

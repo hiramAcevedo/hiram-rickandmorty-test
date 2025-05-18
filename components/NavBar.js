@@ -8,15 +8,27 @@ import Box from '@mui/material/Box';
 import { useAuth } from '../store/auth';
 import { useRouter } from 'next/router';
 
+/**
+ * Componente de barra de navegación
+ * 
+ * Este componente demuestra:
+ * - Uso de estilos con Material-UI (sx prop)
+ * - Acceso al estado global de la aplicación (Zustand)
+ * - Eventos de usuario (onClick para logout)
+ * - Navegación programática (useRouter)
+ * - Renderizado condicional basado en el estado del usuario
+ */
 export default function NavBar() {
   const { user, favorite, logout } = useAuth();
   const router = useRouter();
 
+  // Evento de logout con navegación programática
   const handleLogout = () => {
     logout();
     router.replace('/login');
   };
 
+  // Renderizado condicional - No mostrar si no hay usuario
   if (!user) return null;
 
   return (
@@ -34,7 +46,7 @@ export default function NavBar() {
           Personajes
         </Typography>
 
-        {/* Avatar y nombre de usuario */}
+        {/* Renderizado condicional del avatar del personaje favorito */}
         {favorite && (
           <Box sx={{ display: 'flex', alignItems: 'center', mr: 2 }}>
             <Avatar
@@ -46,6 +58,7 @@ export default function NavBar() {
         )}
         <Typography sx={{ mr: 2 }}>{user}</Typography>
 
+        {/* Botón con evento para cerrar sesión */}
         <Button variant="contained" color="success" onClick={handleLogout}>
           Logout
         </Button>

@@ -5,13 +5,21 @@ import { useRouter } from 'next/router';
 import {
   Container,
   Grid,
-  Card,
-  CardMedia,
-  CardContent,
   Typography
 } from '@mui/material';
 import { useAuth } from '../../store/auth';
+import CharacterCard from '../../components/CharacterCard';
 
+/**
+ * Página de listado de personajes
+ * 
+ * Implementa:
+ * - Diseño con Grid para listas
+ * - Scroll infinito para cargar más datos
+ * - Navegación a páginas de detalle
+ * - Paso de datos a componentes hijos (CharacterCard)
+ * - Protección de ruta mediante autenticación
+ */
 export default function Characters() {
   const { user, _hydrated } = useAuth();
   const router = useRouter();
@@ -21,14 +29,14 @@ export default function Characters() {
   const [hasMore, setHasMore] = useState(true);
   const loader = useRef(null);
 
-  // 1) Redirect SOLO después de que Zustand se hidrate
+  // Redirección si no hay sesión (después de hidratación de Zustand)
   useEffect(() => {
     if (_hydrated && !user) {
       router.replace('/login');
     }
   }, [_hydrated, user, router]);
 
-  // 2) Fetch de páginas cuando haya sesión y tras hidratación
+  // Fetch de personajes con paginación
   const fetchCharacters = useCallback(async () => {
     try {
       const res = await axios.get(
@@ -48,7 +56,7 @@ export default function Characters() {
     }
   }, [_hydrated, user, fetchCharacters]);
 
-  // 3) Infinite scroll observer permanece siempre en el DOM
+  // Implementación de scroll infinito con Intersection Observer
   useEffect(() => {
     if (!loader.current || !hasMore) return;
     const obs = new IntersectionObserver(
@@ -63,46 +71,29 @@ export default function Characters() {
     return () => obs.disconnect();
   }, [hasMore]);
 
+  // Navegación a la página de detalle
   const openDetail = id => router.push(`/characters/${id}`);
 
   return (
     <Container sx={{ py: 4 }}>
-
+      {/* Grid para mostrar lista de personajes */}
       <Grid container spacing={2} justifyContent="center" alignItems="stretch">
-        {chars.map(ch => (
-          <Grid item key={ch.id} xs={12} sm={6} md={4} lg={3}>
-            <Card
-              onClick={() => openDetail(ch.id)}
-              sx={{
-                cursor: 'pointer',
-                height: '100%',
-                display: 'flex',
-                flexDirection: 'column',
-                transition: 'transform 0.3s ease, box-shadow 0.3s ease',
-                '&:hover': {
-                  transform: 'scale(1.05)',
-                  boxShadow: theme => theme.shadows[6]
-                }
-              }}
-            >
-              <CardMedia
-                component="img"
-                image={ch.image}
-                alt={ch.name}
-                sx={{ height: 200, objectFit: 'cover' }}
-              />
-              <CardContent sx={{ flexGrow: 1 }}>
-                <Typography variant="h6">{ch.name}</Typography>
-                <Typography variant="body2">
-                  {ch.species} – {ch.status}
-                </Typography>
-              </CardContent>
-            </Card>
+        {chars.map(character => (
+          <Grid item key={character.id} xs={12} sm={6} md={4} lg={3}>
+            {/* 
+              Paso de datos al componente hijo:
+              - character: datos completos del personaje
+              - onClick: función para navegar al detalle
+            */}
+            <CharacterCard 
+              character={character} 
+              onClick={() => openDetail(character.id)} 
+            />
           </Grid>
         ))}
       </Grid>
 
-      {/* Sentinel para infinite scroll, siempre presente */}
+      {/* Elemento centinela para infinite scroll */}
       <div ref={loader} style={{ height: 1 }} />
 
       {!hasMore && (
